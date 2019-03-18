@@ -203,6 +203,11 @@ def MajBaseJour(Table,Valeur):
     cursor.execute("INSERT INTO "+str(Table)+" Values ('"+str(jour)+"','"+str(Valeur)+"') ON DUPLICATE KEY UPDATE Valeur='"+str(Valeur)+"'")
 
 #
+# Maj des tables RRDTools pour l'affichage des graphiques 
+#
+def MajRRD(Table,Valeur):
+    os.system("rrdupdate /home/pi/rrd/"+Table+".rrd N:"+str(Valeur))
+#
 # Fonction qui va traiter le retour de l'ordre 0x220101
 # Ce script va parser la chaine, se placer sur les octets, extraire
 # les valeurs (1, 2, 3 ou 4 octets) et les stocker dans les tables qui vont bien
@@ -211,33 +216,43 @@ def ATraiterBloc1(Rep):
     StateOfCharge=Recup1(Rep,b'7EC 21 FF ',0)/2
     print("StateOfCharge:" + str(StateOfCharge)+" %")
     MajBase("StateOfCharge",StateOfCharge)
+    MajRRD("StateOfCharge",StateOfCharge)
     BatteryCurrent=Recup2(Rep,b'7EC 22 ',0)/10
     print("Battery Current:" + str(BatteryCurrent)+" A")
     MajBase("BatteryCurrent",BatteryCurrent)
+    MajRRD("BatteryCurrent",BatteryCurrent)
     BatteryDCVoltage=Recup2(Rep,b'7EC 22 ',6)/10
     print("Battery DC Voltage:" + str(BatteryDCVoltage)+" V")
     MajBase("BatteryDCVoltage",BatteryDCVoltage)
+    MajRRD("BatteryDCVoltage",BatteryDCVoltage)
     InletMaxTempBattery=Recup1(Rep,b'7EC 22 ',12)
     print("InletMaxTempBattery:"+ str(InletMaxTempBattery)+" °C")
     MajBase("InletMaxTempBattery",InletMaxTempBattery)
+    MajRRD("InletMaxTempBattery",InletMaxTempBattery)
     InletMinTempBattery=Recup1(Rep,b'7EC 22 ',15)
     print("InletMinTempBattery:"+ str(InletMinTempBattery)+" °C")
     MajBase("InletMinTempBattery",InletMinTempBattery)
+    MajRRD("InletMinTempBattery",InletMinTempBattery)
     TempModuleBat1=Recup1(Rep,b'7EC 22 ',18)
     print("TempModuleBat1:"+ str(TempModuleBat1)+" °C")
     MajBase("TempModuleBat1",TempModuleBat1)
+    MajRRD("TempModuleBat1",TempModuleBat1)
     TempModuleBat2=Recup1(Rep,b'7EC 23 ',0)
     print("TempModuleBat2:"+ str(TempModuleBat2)+" °C")
     MajBase("TempModuleBat2",TempModuleBat2)
+    MajRRD("TempModuleBat2",TempModuleBat2)
     TempModuleBat3=Recup1(Rep,b'7EC 23 ',3)
     print("TempModuleBat3:"+ str(TempModuleBat3)+" °C")
     MajBase("TempModuleBat3",TempModuleBat3)
+    MajRRD("TempModuleBat3",TempModuleBat3)
     TempModuleBat4=Recup1(Rep,b'7EC 23 ',6)
     print("TempModuleBat4:"+ str(TempModuleBat4)+" °C")
     MajBase("TempModuleBat4",TempModuleBat4)
+    MajRRD("TempModuleBat4",TempModuleBat4)
     InletTempBattery=Recup1(Rep,b'7EC 23 ',15)
     print("InletTempBattery:"+ str(InletTempBattery)+" °C")
     MajBase("InletTempBattery",InletTempBattery)
+    MajRRD("InletTempBattery",InletTempBattery)
     Maximum_Cell_Voltage=Recup1(Rep,b'7EC 23 ',18)/50
     print("Maximum Cell Voltage:"+ str(Maximum_Cell_Voltage))
     MajBase("MaximumCellVoltage",Maximum_Cell_Voltage)
@@ -253,12 +268,15 @@ def ATraiterBloc1(Rep):
     Battery_Fan_Status=Recup1(Rep,b'7EC 24 ',9)
     print("Battery_Fan_Status:"+ str(Battery_Fan_Status))
     MajBase("BatteryFanStatus",Battery_Fan_Status)
+    MajRRD("BatteryFanStatus",Battery_Fan_Status)
     Battery_Fan_Feedback=Recup1(Rep,b'7EC 24 ',12)
     print("Battery_Fan_Feedback:"+ str(Battery_Fan_Feedback)+" Hz")
     MajBase("BatteryFanFeedback",Battery_Fan_Feedback)
+    MajRRD("BatteryFanFeedback",Battery_Fan_Feedback)
     Auxillary_Battery_Voltage=Recup1(Rep,b'7EC 24 ',15)/10
     print("Auxillary_Battery_Voltage:"+ str(Auxillary_Battery_Voltage)+" V")
     MajBase("AuxillaryBatteryVoltage",Auxillary_Battery_Voltage)
+    MajRRD("AuxillaryBatteryVoltage",Auxillary_Battery_Voltage)
     CumulativeChargeCurrent=Recup1(Rep,b'7EC 24 ',18)*16777216+Recup3(Rep,b'7EC 25 ',0)/10
     print("CumulativeChargeCurrent:"+ str(CumulativeChargeCurrent)+" AH")
     MajBase("CumulativeChargeCurrent",CumulativeChargeCurrent)
@@ -277,6 +295,7 @@ def ATraiterBloc1(Rep):
     InverterCapacitorVoltage=(Recup1(Rep,b'7EC 27 ',18)*256+Recup1(Rep,b'7EC 28 ',0))
     print("Inverter Capacitor Voltage:" +str(InverterCapacitorVoltage)+" V")
     MajBase("InverterCapacitorVoltage",InverterCapacitorVoltage)
+    MajRRD("InverterCapacitorVoltage",InverterCapacitorVoltage)
     MotorSpeed1=Recup2(Rep,b'7EC 28 ',3)
     print("MotorSpeed1:"+str(MotorSpeed1))
     MajBase("MotorSpeed1",MotorSpeed1)
@@ -326,9 +345,11 @@ def ATraiterBloc3(Rep):
     StateOfChargeDisplay=Recup1(Rep,b'7EC 25 ',0)/2
     print("StateOfChargeDisplay:" + str(StateOfChargeDisplay)+" %")
     MajBase("StateOfChargeDisplay",StateOfChargeDisplay)
+    MajRRD("StateOfChargeDisplay",StateOfChargeDisplay)
     StateOfHealth=Recup2(Rep,b'7EC 24 ',3)/10
     print("StateOfHealth:" + str(StateOfHealth)+" %")
     MajBase("StateOfHealth",StateOfHealth)
+    MajRRD("StateOfHealth",StateOfHealth)
     Maximum_Deterioration_Cell_No=Recup1(Rep,b'7EC 24 ',9)
     print("Maximum_Deterioration_Cell_No:"+ str(Maximum_Deterioration_Cell_No))
     MajBase("MaximumDeteriorationCellNo",Maximum_Deterioration_Cell_No)
@@ -379,4 +400,3 @@ AppelOBD('220105',2)
 ATraiterBloc3(Reponse[0])
 
 ser.close()
-
