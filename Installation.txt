@@ -1,0 +1,63 @@
+Introduction:
+Pour la France (et l'Europe), la fonctionnalité UVO Connect n'est pas activée pour la e-Niro. Pour moi, j'aime bien savoir quand ma voiture a fini de charger ou voir si la charge est toujours en cours.
+Le but de ce petit projet est d'arriver à faire la même chose que je peux faire avec ma Nissan Leaf, à savoir:
+1. Vérifier l'état de la charge actuelle (en cours, %), interrogation à distance avec un mobile et connaitre sa position Gps.
+2. Vérifier l'état technique de la batterie (perte, etc...)
+3. Optionnel, permettre d'enclencher le chauffage/clim à distance
+
+Tout fonctionne avec du materiel que j'avais en stock chez moi, ce n'est pas le plus optimal, mais cela fonctionne, il faut prévoir:
+1. Raspberry pi 2 (ou 3)
+2. Module Usb-Bluetooth (si Raspberry Pi 3), c'est inutile car integré.
+3. Boitier Elm327 en Bluetooth ou Usb/Série (voir 2)
+4. Module Gps, optionnel aussi
+5. Module Sim800L en Usb qui permet d'interroger le module à distance, aussi une option pour certains.
+6. MicroSD de 16Go pour le RaspberryPi.
+Donc un budget de 50 à 70 euros environ.
+
+Au préalable, il faut des connaissances sur Gnu/Linux et un peu de réseau pour la partie Gsm et accès distant au Raspberry Pi.
+
+Installation:
+Le plus simple, installer l'Os avec le mode graphique, le brancher sur un écran (hdmi), un clavier/souris.
+Installer une Raspbian sur la carte MicroSD, prévoir l'accès SSH (https://raspbian-france.fr/controlez-raspberry-pi-ssh-ordinateur/)
+Ajouter certains paquets avec les commandes suivantes:
+apt install screen, apache2, mysql-server, etc...
+Connecter le module Elm327, via l'interface graphique ou via bash. Voir https://www.framboise314.fr/avec-la-nouvelle-jessie-le-bluetooth-encore-plus-facile/
+Le code PIN du module est souvent '1234' ou '0000'.
+Pour tester, vous pouvez faire un screen /dev/rfcomm0 et taper ATZ, il doit répondre OK. Bien quitter la commande screen sinon, elle gardera la main sur le peripherique.
+
+Pour le module Gps, il faut installer Gpsd, gps-clients suivant la doc suivante: http://www.intellamech.com/RaspberryPi-projects/rpi3_gps.html
+Le Gps permet aussi de mettre à l'heure le Raspberry qui par defaut n'a pas d'horloge RTC avec pile en modifiant le fichier /etc/ntp.conf.
+
+Le test peut se faire avec "cgps -s" qui doit présenter des satellites et sa position dans les 3 à 13 minutes, attention, l'antenne doit être en dehors d'un batiment!
+
+Le module Gsm (pour moi, un petit Sim800L avec un abonnement Free à 2 euros) est connecté sur un port en Usb est accessible en mode Série. Rien à configurer, mais il faut vérifier le /dev/ttyUSBxx utilisé.
+
+Une fois que chaque module est bien configuré, relancer le Raspberry pour vérifier que les peripheriques sont toujours sur les même pseudo dev (/dev/ttyUSBxx par exemple).
+
+Maintenant, la partie programmation/systsème:
+1. Créer la base de données Mysql qui va bien, mon module n'ayant pas besoin de securité, j'ai ajouté une base Mysql eniro avec un utilisateur eniro et mot de passe eniro.
+Voici les commandes à taper:
+mysql
+ >CREATE USER 'eniro'@'localhost' IDENTIFIED BY 'eniro'
+ >CREATE DATABASE eniro;
+ >GRANT ALL PRIVILEGES ON eniro TO 'eniro'@'localhost';
+ >quit
+
+'mysql' va permettre d'aller dans l'interface d'administration des bases de données
+les commandes CREATE vont ajouter un utilisateur, la base et la commande Grant va donner tous les droits à 'eniro' sur la base 'eniro'.
+Les tables seront ajoutées au lancement du script eniro.py.
+
+Se connecter 'root' (via sudo -i) et copier le script eniro.py dans /root par exemple, le rendre executable avec chmod u+x /root/eniro.py
+L'executer une première fois pour valider son fonctionnement, attention, il faut avoir la voiture en charge ou en route pour la reprise des données. Ce script va peupler la base de données et lire les valeurs de la voiture.
+
+Pour automatiser ce script, il suffit de l'ajouter dans la crontab de root (équivalent au planificateur de tâches Windows), ici toutes les 10 minutes:
+*/10 * * * * /root/eniro.py
+
+Pour la partie web, ajouter le fichier index.php dans /var/www/html/ en supprimant /var/www/html/index.html
+une fois que le script /root/eniro.py a été lancé une fois sans erreur, vous pouvez aller sur le site web de votre Raspberry (http://localhost/index.php sur l'écran du raspberry) ou http://x.x.x.x/index.html à partir d'un pc du réseau local s'il est branché en Wifi ou ethernet. x.x.x.x est l'adresse que votre box aura donné au boitier (souvent de type 192.168.1.x)
+
+Pour la partie Gsm, il faut copier Sms.py dans /root, modifier les droits (chmod u+x /root/sms.py) et le No de telephone de retour dans le script (attention, prévoir le +336.... sinon, cela ne fonctionnera pas. Pour tester lancer la commande /root/sms.py, Il suffit ensuite d'envoyer un sms au module à partir de votre telephone, il renverra dans les 30 secondes un SMS avec la date et la charge actuelle.
+
+Pour automatiser le lancement de ce script, il faut ajouter dans la crontab de root la ligne suivante:
+@reboot /root/Sms.py
+
