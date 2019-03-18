@@ -71,7 +71,7 @@ def setup():
                 ChaineAEnvoyer=str("e-Niro:")+str(Jour)+str(" ")+HVC+" avec "+str(StateOfChargeDisplay)+str(" %\x1a\r")
                 print(ChaineAEnvoyer)
 		#On indique le telephone de destination du Sms
-                ser.write(b'AT+CMGS="+33601010101"\r')
+                ser.write(b'AT+CMGS="+33601020304"\r')
                 time.sleep(3)
                 ser.write(ChaineAEnvoyer.encode('ascii')) # encodage en Ascii de notre message à envoyer
                 time.sleep(3)
