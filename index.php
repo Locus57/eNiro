@@ -2,9 +2,14 @@
 <head>
 <title>Status e-Niro</title>
 <style>
+#body {
+ font-family:"times new roman", times, serif;
+ font-size:90%;
+}
 #Cellules {
 border-collapse: collapse;
 width; 100%;
+
 }
 #Cellules tr:nth-child(even){background-color: #f2f2f2;}
 #Cellules tr:nth-child(odd){background-color: #e0e0e0;}
@@ -17,7 +22,10 @@ width; 100%;
   text-align: left;
   color: black;
 }
-
+#p,div,h1,td {
+ font-family:"times new roman", times, serif;
+ font-size:90%;
+}
 #progress {
   background: #333;
   border-radius: 13px;
@@ -35,19 +43,36 @@ width; 100%;
 }
 div#colonne1 {
 	float: left;
-	width: 240px;
+	width: 340px;
+	height: 18px;
+ font-family:"times new roman", times, serif;
+ font-size:90%;
 }
 div#colonne2 {
 	float: left;
-	width: 200px;
+	width: 280px;
+	height: 18px;
+ font-family:"times new roman", times, serif;
+ font-size:90%;
 }
 div#colone3 {
 	float: left;
 	width: 70px;
+	height: 18px;
+ font-family:"times new roman", times, serif;
+ font-size:90%;
 }
+
 </style>
 </head>
 <body>
+
+<script>
+function AffGraph(Contenu){
+	Txt="<br><img src=stats/"+Contenu+".jour.png><br><img src=stats/"+Contenu+".semaine.png><br><br><img src=stats/"+Contenu+".mois.png><br><br><img src=stats/"+Contenu+".annee.png><br>";
+	document.getElementById("graphique").innerHTML=Txt;
+}
+</script>
 <h1>e-Niro</h1>
 <?php
 // Connexion et sélection de la base
@@ -186,33 +211,37 @@ div#colone3 {
  $line=mysqli_fetch_array($result, MYSQLI_ASSOC);
  $BatteryCellVoltageDeviation=$line['Valeur'];
 
-  echo "<div>La dernière position connue de la voiture <a href=http://www.openstreetmap.org/?mlat=".$lattitude."&mlon=".$longitude."&zoom=12>Longitude=".$longitude." et lattitude=".$lattitude."</a></div>";
- echo "<div id=colonne1>Etat de Charge</div><div id=colonne2><progress id=progress max=100 value=".$StateOfCharge." ></progress></div><div id=colonne3>".$StateOfCharge." %</div><br><br>";
- echo "<div id=colonne1>Etat de Charge visualisé</div><div id=colonne2><progress id=progress max=100 value=".$StateOfChargeDisplay." ></progress></div><div id=colonne3>".$StateOfChargeDisplay." %</div><br><br>";
- echo "<div id=colonne1>Etat de sante batterie</div><div id=colonne2><progress id=progress max=100 value=".$StateOfHealth." ></progress></div><div id=colonne3>".$StateOfHealth." %</div><br><br>";
- echo "<div id=colonne1>Charge haute tension</div><div id=colonne2>".$HVCharging."</div><br><br>";
- echo "<div id=colonne1>Conso batterie actuelle</div><div id=colonne2>".$BatteryCurrent." A</div><br><br>";
- echo "<div id=colonne1>Batterie DC</div><div id=colonne2>".$BatteryDCVoltage." Volts</div><br><br>";
- echo "<div id=colonne1>Temp max entree batterie</div><div id=colonne2>".$InletMaxTempBattery." °C</div><br><br>";
- echo "<div id=colonne1>Temp min entree batterie</div><div id=colonne2>".$InletMinTempBattery." °C</div><br><br>";
- echo "<div id=colonne1>Temp entree batterie</div><div id=colonne2>".$InletTempBattery." °C</div><br><br>";
- echo "<div id=colonne1>Temp dans batterie</div><div id=colonne2>".$TempModuleBat1." °C, ".$TempModuleBat2." °C, ".$TempModuleBat3." °C, ".$TempModuleBat4." °C</div><br><br>";
- echo "<div id=colonne1>Cellule Max et Volts</div><div id=colonne2>".$MaximumCellVoltageNo." avec ".$MaximumCellVoltage." V</div><br><br>";
- echo "<div id=colonne1>Cellule Min et Volts</div><div id=colonne2>".$MinimumCellVoltageNo." avec ".$MinimumCellVoltage." V</div><br><br>";
- echo "<div id=colonne1>Etat Ventil batterie</div><div id=colonne2><progress id=progress max=9 value=".$BatteryFanStatus." ></progress></div><div id=colonne3>".$BatteryFanStatus." (0-9)</div><br><br>";
- echo "<div id=colonne1>Retour Ventil batterie</div><div id=colonne2><progress id=progress max=120 value=".$BatteryFanFeedback." ></progress></div><div id=colonne3>".$BatteryFanFeedback." Hz</div><br><br>";
- echo "<div id=colonne1>Batterie auxilliaire</div><div id=colonne2>".$AuxillaryBatteryVoltage." Volts</div><br><br>";
- echo "<div id=colonne1>Cumul de courant chargé</div><div id=colonne2>".$CumulativeChargeCurrent." AH</div><br><br>";
- echo "<div id=colonne1>Cumul de courant dechargé</div><div id=colonne2>".$CumulativeDischargeCurrent." AH</div><br><br>";
- echo "<div id=colonne1>Cumul d'energie chargé</div><div id=colonne2>".$CumulativeEnergyCharged." kwh</div><br><br>";
- echo "<div id=colonne1>Cumul d'energie dechargé</div><div id=colonne2>".$CumulativeEnergyDischarged." kwh</div><br><br>";
- echo "<div id=colonne1>Temps d'utilisation</div><div id=colonne2>".$OperatingTime." heures</div><br><br>";
- echo "<div id=colonne1>Tension du condensateur de l'onduleur</div><div id=colonne2>".$InverterCapacitorVoltage." Volts</div><br><br>";
- echo "<div id=colonne1>Vitesse moteur</div><div id=colonne2>".$MotorSpeed1." et ".$MotorSpeed2."</div><br><br>";
- echo "<div id=colonne1>Cellule deteriorée max</div><div id=colonne2>".$MaximumDeteriorationCellNo."</div><br><br>";
- echo "<div id=colonne1>Cellule deteriorée min</div><div id=colonne2>".$MinimumDeteriorationCellNo."</div><br><br>";
- echo "<div id=colonne1>Deviation des cellules</div><div id=colonne2>".$BatteryCellVoltageDeviation."</div><br><br>";
- 
+  #echo "<div>La dernière position connue de la voiture <a href=http://www.openstreetmap.org/?mlat=".$lattitude."&mlon=".$longitude."&zoom=12>Longitude=".$longitude." et lattitude=".$lattitude."</a></div>";
+  echo "<div>La dernière position connue de la voiture <a href=http://www.openstreetmap.org/?mlat=".$lattitude."&mlon=".$longitude."&zoom=12>Longitude=7.5 et lattitude=47.5</a></div>";
+ echo "<div id=colonne1 onclick=AffGraph('StateOfCharge')>Etat de Charge</div><div id=colonne2><progress id=progress max=100 value=".$StateOfCharge." ></progress></div><div id=colonne3>".$StateOfCharge." %</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('StateOfChargeDisplay')>Etat de Charge visualisé</div><div id=colonne2><progress id=progress max=100 value=".$StateOfChargeDisplay." ></progress></div><div id=colonne3>".$StateOfChargeDisplay." %</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('StateOfHealth')>Etat de sante batterie</div><div id=colonne2><progress id=progress max=100 value=".$StateOfHealth." ></progress></div><div id=colonne3>".$StateOfHealth." %</div><br>";
+ echo "<div id=colonne1>Charge haute tension</div><div id=colonne2>".$HVCharging."</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('BatteryCurrent')>Conso batterie actuelle</div><div id=colonne2>".$BatteryCurrent." A</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('BatteryDCVoltage')>Batterie DC</div><div id=colonne2>".$BatteryDCVoltage." Volts</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('InletMaxTempBattery')>Temp max entree batterie</div><div id=colonne2>".$InletMaxTempBattery." °C</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('InletMinTempBattery')>Temp min entree batterie</div><div id=colonne2>".$InletMinTempBattery." °C</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('InletTempBattery')>Temp entree batterie</div><div id=colonne2>".$InletTempBattery." °C</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('TempModuleBat1')>Temp 1 batterie</div><div id=colonne2>".$TempModuleBat1." °C</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('TempModuleBat2')>Temp 1 batterie</div><div id=colonne2>".$TempModuleBat2." °C</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('TempModuleBat3')>Temp 1 batterie</div><div id=colonne2>".$TempModuleBat3." °C</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('TempModuleBat4')>Temp 1 batterie</div><div id=colonne2>".$TempModuleBat4." °C</div><br>";
+ echo "<div id=colonne1>Cellule Max et Volts</div><div id=colonne2>".$MaximumCellVoltageNo." avec ".$MaximumCellVoltage." V</div><br>";
+ echo "<div id=colonne1>Cellule Min et Volts</div><div id=colonne2>".$MinimumCellVoltageNo." avec ".$MinimumCellVoltage." V</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('BatteryFanStatus')>Etat Ventil batterie</div><div id=colonne2><progress id=progress max=9 value=".$BatteryFanStatus." ></progress></div><div id=colonne3>".$BatteryFanStatus." (0-9)</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('BatteryFanFeedback')>Retour Ventil batterie</div><div id=colonne2><progress id=progress max=120 value=".$BatteryFanFeedback." ></progress></div><div id=colonne3>".$BatteryFanFeedback." Hz</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('AuxillaryBatteryVoltage')>Batterie auxilliaire</div><div id=colonne2>".$AuxillaryBatteryVoltage." Volts</div><br>";
+ echo "<div id=colonne1>Cumul de courant chargé</div><div id=colonne2>".$CumulativeChargeCurrent." AH</div><br>";
+ echo "<div id=colonne1>Cumul de courant dechargé</div><div id=colonne2>".$CumulativeDischargeCurrent." AH</div><br>";
+ echo "<div id=colonne1>Cumul d'energie chargé</div><div id=colonne2>".$CumulativeEnergyCharged." kwh</div><br>";
+ echo "<div id=colonne1>Cumul d'energie dechargé</div><div id=colonne2>".$CumulativeEnergyDischarged." kwh</div><br>";
+ echo "<div id=colonne1>Temps d'utilisation</div><div id=colonne2>".$OperatingTime." heures</div><br>";
+ echo "<div id=colonne1 onclick=AffGraph('InverterCapacitorVoltage')>Tension du condensateur de l'onduleur</div><div id=colonne2>".$InverterCapacitorVoltage." Volts</div><br>";
+ echo "<div id=colonne1>Vitesse moteur</div><div id=colonne2>".$MotorSpeed1." et ".$MotorSpeed2."</div><br>";
+ echo "<div id=colonne1>Cellule deteriorée max</div><div id=colonne2>".$MaximumDeteriorationCellNo."</div><br>";
+ echo "<div id=colonne1>Cellule deteriorée min</div><div id=colonne2>".$MinimumDeteriorationCellNo."</div><br>";
+ echo "<div id=colonne1>Deviation des cellules</div><div id=colonne2>".$BatteryCellVoltageDeviation."</div><br>";
+ echo "<div id=graphique></div>"; 
  // Exécution des requêtes SQL
  $query = 'SELECT * FROM Cellules order by id';
  $result = mysqli_query($link,$query) or die('Échec de la requête : ' . mysqli_error());
@@ -234,5 +263,6 @@ div#colone3 {
  // Fermeture de la connexion
  mysqli_close($link);
 ?>
+
 </html>
 </body>
