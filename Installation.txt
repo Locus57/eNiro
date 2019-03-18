@@ -20,7 +20,7 @@ Installation:
 Le plus simple, installer l'Os avec le mode graphique, le brancher sur un écran (hdmi), un clavier/souris.
 Installer une Raspbian sur la carte MicroSD, prévoir l'accès SSH (https://raspbian-france.fr/controlez-raspberry-pi-ssh-ordinateur/)
 Ajouter certains paquets avec les commandes suivantes:
-apt install bluez apache2 screen vim python3 python3-serial php7.0-mysql php7.0-gd openssh-client openssh-server ntp mysql-server mysql-client gpsd gpsd-clients python3-mysql.connector python3.pip pi-bluetooth pps-tools
+apt install bluez apache2 screen vim python3 python3-serial php7.0-mysql php7.0-gd openssh-client openssh-server ntp mysql-server mysql-client gpsd gpsd-clients python3-mysql.connector python3.pip pi-bluetooth pps-tools rrdtools
 Il faudra aussi ajouter une bibliotheque python3 qui n'est pas dans Raspbian de base si vous utilisez le gps
 pip3 install gpsd-py3
 Connecter le module Elm327, via l'interface graphique ou via bash. Voir https://www.framboise314.fr/avec-la-nouvelle-jessie-le-bluetooth-encore-plus-facile/
@@ -85,8 +85,13 @@ Les tables seront ajoutées au lancement du script eniro.py.
 Se connecter 'root' (via sudo -i) et copier le script eniro.py dans /root par exemple, le rendre executable avec chmod u+x /root/eniro.py
 L'executer une première fois pour valider son fonctionnement, attention, il faut avoir la voiture en charge ou en route pour la reprise des données. Ce script va peupler la base de données et lire les valeurs de la voiture.
 
-Pour automatiser ce script, il suffit de l'ajouter dans la crontab de root (équivalent au planificateur de tâches Windows), ici toutes les 10 minutes:
-*/10 * * * * /root/Eniro.py
+Lancer une fois le programme CreationRRD.sh qui va creer les fichier rrdtools pour les graphiques
+
+Il faudra ensuite lancer le script Graph.sh pour mettre à jour les graphiques. Ces graphiques sont disponibles en cliquant sur le texte du graphique voulu, par exemple: Etate de Charge. Il affichera un graphique du jour, semaine, mois et année. Attention, le graphique ne pourra se faire qu'avec au moins 3 à 4 données sur un temps de 20 minutes.
+
+Pour automatiser ce script, il suffit de l'ajouter dans la crontab de root (équivalent au planificateur de tâches Windows), ici toutes les 5 minutes:
+*/5 * * * * /root/Eniro.py
+*/5 * * * * /root/Graph.sh
 
 Pour la partie web, ajouter le fichier index.php dans /var/www/html/ en supprimant /var/www/html/index.html
 une fois que le script /root/eniro.py a été lancé une fois sans erreur, vous pouvez aller sur le site web de votre Raspberry (http://localhost/index.php sur l'écran du raspberry) ou http://x.x.x.x/index.html à partir d'un pc du réseau local s'il est branché en Wifi ou ethernet. x.x.x.x est l'adresse que votre box aura donné au boitier (souvent de type 192.168.1.x)
