@@ -20,13 +20,48 @@ Installation:
 Le plus simple, installer l'Os avec le mode graphique, le brancher sur un écran (hdmi), un clavier/souris.
 Installer une Raspbian sur la carte MicroSD, prévoir l'accès SSH (https://raspbian-france.fr/controlez-raspberry-pi-ssh-ordinateur/)
 Ajouter certains paquets avec les commandes suivantes:
-apt install screen, apache2, mysql-server, etc...
+apt install bluez apache2 screen vim python3 python3-serial php7.0-mysql php7.0-gd openssh-client openssh-server ntp mysql-server mysql-client gpsd gpsd-clients python3-mysql.connector python3.pip pi-bluetooth pps-tools
+Il faudra aussi ajouter une bibliotheque python3 qui n'est pas dans Raspbian de base si vous utilisez le gps
+pip3 install gpsd-py3
 Connecter le module Elm327, via l'interface graphique ou via bash. Voir https://www.framboise314.fr/avec-la-nouvelle-jessie-le-bluetooth-encore-plus-facile/
 Le code PIN du module est souvent '1234' ou '0000'.
 Pour tester, vous pouvez faire un screen /dev/rfcomm0 et taper ATZ, il doit répondre OK. Bien quitter la commande screen sinon, elle gardera la main sur le peripherique.
 
 Pour le module Gps, il faut installer Gpsd, gps-clients suivant la doc suivante: http://www.intellamech.com/RaspberryPi-projects/rpi3_gps.html
-Le Gps permet aussi de mettre à l'heure le Raspberry qui par defaut n'a pas d'horloge RTC avec pile en modifiant le fichier /etc/ntp.conf.
+Il faudra modifier le fichier /etc/default/gpsd: mon module gps est sur /dev/ttyUSB1
+------------------------------------
+# Default settings for the gpsd init script and the hotplug wrapper.
+
+# Start the gpsd daemon automatically at boot time
+START_DAEMON="true"
+
+# Use USB hotplugging to add new USB devices automatically to the daemon
+USBAUTO="true"
+
+# Devices gpsd should collect to at boot time.
+# They need to be read/writeable, either by user gpsd or the group dialout.
+DEVICES="/dev/ttyUSB1"
+
+# Other options you want to pass to gpsd
+GPSD_OPTIONS="-n"
+------------------------------------
+Le Gps permet aussi de mettre à l'heure le Raspberry qui par defaut n'a pas d'horloge RTC avec pile en modifiant le fichier /etc/ntp.conf en ajoutant les lignes suivantes:
+------------------------------------
+#PPS Kernel mode
+server 127.127.22.0 minpoll 4 maxpoll 4 true
+fudge 127.127.22.0 flag3 1 refid PPS
+
+# GPS Serial data Reference
+server 127.127.28.0 minpoll 4 maxpoll 4 iburst prefer
+fudge 127.127.28.0 flag1 1 time1 0.500 refid GPS stratum 1
+
+# Shared Memory 2 source
+server 127.127.28.2 minpoll 4 maxpoll 4
+fudge 127.127.28.2 flag1 1 refid SHM2
+
+# Fix False tickers
+tos mindist 0.5
+------------------------------------
 
 Le test peut se faire avec "cgps -s" qui doit présenter des satellites et sa position dans les 3 à 13 minutes, attention, l'antenne doit être en dehors d'un batiment!
 
@@ -51,7 +86,7 @@ Se connecter 'root' (via sudo -i) et copier le script eniro.py dans /root par ex
 L'executer une première fois pour valider son fonctionnement, attention, il faut avoir la voiture en charge ou en route pour la reprise des données. Ce script va peupler la base de données et lire les valeurs de la voiture.
 
 Pour automatiser ce script, il suffit de l'ajouter dans la crontab de root (équivalent au planificateur de tâches Windows), ici toutes les 10 minutes:
-*/10 * * * * /root/eniro.py
+*/10 * * * * /root/Eniro.py
 
 Pour la partie web, ajouter le fichier index.php dans /var/www/html/ en supprimant /var/www/html/index.html
 une fois que le script /root/eniro.py a été lancé une fois sans erreur, vous pouvez aller sur le site web de votre Raspberry (http://localhost/index.php sur l'écran du raspberry) ou http://x.x.x.x/index.html à partir d'un pc du réseau local s'il est branché en Wifi ou ethernet. x.x.x.x est l'adresse que votre box aura donné au boitier (souvent de type 192.168.1.x)
